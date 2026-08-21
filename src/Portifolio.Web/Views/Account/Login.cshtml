@@ -1,0 +1,34 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Entrar";
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entrar — Edição</title>
+    <link rel="stylesheet" href="~/css/edit.css" asp-append-version="true" />
+    <style>body { display: block; }</style>
+</head>
+<body>
+    <partial name="_IconSprite" />
+    <div class="login">
+        <h1>Edição do portfólio</h1>
+        <p class="hint">Entre com usuário e senha para alterar os dados.</p>
+        <form method="post" action="@Url.Content("~/edit/login")">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@(ViewBag.ReturnUrl ?? Url.Content("~/edit"))" />
+            <div asp-validation-summary="All"></div>
+            <label>Usuário</label>
+            <input name="userName" autocomplete="username" required />
+            <label>Senha</label>
+            <input type="password" name="password" autocomplete="current-password" required />
+            <div class="actions">
+                <button type="submit">@await Html.PartialAsync("_Icon", "login") Entrar</button>
+                <a class="btn ghost" href="~/">@await Html.PartialAsync("_Icon", "back") Voltar ao site</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

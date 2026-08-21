@@ -1,0 +1,15 @@
+@model Portifolio.Web.Models.PortfolioDto
+@{
+    Layout = "_EditLayout";
+    ViewData["Title"] = "Painel";
+}
+<h1>Painel</h1>
+<p class="hint">@Model.Studio.Name — @Model.People.Count perfis, @Model.Projects.Count projetos.</p>
+<div class="actions">
+    <a class="btn" href="~/edit/estudio">@await Html.PartialAsync("_Icon", "studio") Estúdio</a>
+    <a class="btn" href="~/edit/textos">@await Html.PartialAsync("_Icon", "text") Textos</a>
+    <a class="btn" href="~/edit/perfis">@await Html.PartialAsync("_Icon", "users") Perfis</a>
+    <a class="btn" href="~/edit/projetos">@await Html.PartialAsync("_Icon", "briefcase") Projetos</a>
+    <a class="btn" href="~/edit/stacks">@await Html.PartialAsync("_Icon", "layers") Stacks</a>
+    <a class="btn" href="~/edit/usuarios">@await Html.PartialAsync("_Icon", "user") Usuários</a>
+</div>

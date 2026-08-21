@@ -1,0 +1,49 @@
+@model List<Portifolio.Web.Models.ApplicationUser>
+@{
+    Layout = "_EditLayout";
+    ViewData["Title"] = "Usuários";
+}
+<h1>Usuários</h1>
+<p class="hint">Quem entra em /edit precisa de um usuário cadastrado aqui.</p>
+<form method="post">
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div>
+            <label>Usuário</label>
+            <input name="userName" required />
+        </div>
+        <div>
+            <label>E-mail</label>
+            <input name="email" type="email" required />
+        </div>
+    </div>
+    <div class="row">
+        <div>
+            <label>Nome</label>
+            <input name="displayName" />
+        </div>
+        <div>
+            <label>Senha</label>
+            <input name="password" type="password" required />
+        </div>
+    </div>
+    <div class="actions"><button type="submit">@await Html.PartialAsync("_Icon", "plus") Criar usuário</button></div>
+</form>
+<table>
+    <thead><tr><th>Usuário</th><th>E-mail</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var u in Model)
+    {
+        <tr>
+            <td>@u.UserName</td>
+            <td>@u.Email</td>
+            <td>
+                <form method="post" action="~/edit/usuarios/@u.Id/excluir" onsubmit="return confirm('Remover @u.UserName?');">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-icon ghost danger" type="submit" title="Excluir" aria-label="Excluir">@await Html.PartialAsync("_Icon", "trash")</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -1,0 +1,87 @@
+@model Portifolio.Web.Models.SiteCopyDto
+@{
+    Layout = "_EditLayout";
+    ViewData["Title"] = "Textos";
+    var json = new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase };
+    var stacks = (ViewBag.Stacks as List<Portifolio.Web.Models.StackItem>) ?? [];
+}
+<h1>Textos do site</h1>
+<form method="post">
+    @Html.AntiForgeryToken()
+    <label>Selo do hero</label>
+    <input name="Eyebrow" value="@Model.Eyebrow" />
+    <label>Linha do menu</label>
+    <input name="NavLine" value="@Model.NavLine" />
+    <label>Rótulo das fotos</label>
+    <input name="VennLabel" value="@Model.VennLabel" />
+    <label>Missão</label>
+    <textarea class="html-editor" name="Mission">@Model.Mission</textarea>
+    <section class="list-block">
+        <div class="list-head">
+            <h2>Números</h2>
+            <button type="button" class="btn ghost" id="add-stat">@await Html.PartialAsync("_Icon", "plus") Novo número</button>
+        </div>
+        <ul class="item-list" id="stats-list"></ul>
+        <div id="hidden-stats"></div>
+    </section>
+    <input type="hidden" name="TrajectoryTitle" value="@Model.TrajectoryTitle" />
+    <input type="hidden" name="TrajectoryLead" value="@Model.TrajectoryLead" />
+    <label>Título de quem somos</label>
+    <input name="ProfilesTitle" value="@Model.ProfilesTitle" />
+    <label>Texto de quem somos</label>
+    <textarea class="html-editor" name="ProfilesLead">@Model.ProfilesLead</textarea>
+    <label>Título dos projetos</label>
+    <input name="ProjectsTitle" value="@Model.ProjectsTitle" />
+    <label>Texto dos projetos</label>
+    <textarea class="html-editor" name="ProjectsLead">@Model.ProjectsLead</textarea>
+    <label>Título da stack</label>
+    <input name="StackTitle" value="@Model.StackTitle" />
+    <section class="list-block">
+        <div class="list-head">
+            <h2>Ferramentas &amp; tecnologias</h2>
+            <a class="btn ghost" href="~/edit/stacks">@await Html.PartialAsync("_Icon", "plus") Gerenciar stacks</a>
+        </div>
+        <ul class="item-list">
+            @if (stacks.Count == 0)
+            {
+                <li class="empty">Nenhuma stack cadastrada.</li>
+            }
+            else
+            {
+                foreach (var item in stacks)
+                {
+                    <li><div><strong>@item.Name</strong></div></li>
+                }
+            }
+        </ul>
+    </section>
+    <label>Selo do contato</label>
+    <input name="CtaEyebrow" value="@Model.CtaEyebrow" />
+    <label>Título do contato</label>
+    <textarea class="html-editor" name="CtaTitle">@Model.CtaTitle</textarea>
+    <label>Texto do contato</label>
+    <textarea class="html-editor" name="CtaLead">@Model.CtaLead</textarea>
+    <label>Texto do rodapé</label>
+    <textarea class="html-editor" name="FooterBlurb">@Model.FooterBlurb</textarea>
+    <div class="actions"><button type="submit">@await Html.PartialAsync("_Icon", "save") Salvar</button></div>
+</form>
+
+<div class="modal-backdrop" id="stat-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="stat-modal-title">
+        <h2 id="stat-modal-title">Número</h2>
+        <label>Valor</label>
+        <input id="stat-value" />
+        <label>Texto</label>
+        <input id="stat-label" />
+        <div class="actions">
+            <button type="button" id="stat-save">@await Html.PartialAsync("_Icon", "save") Salvar item</button>
+            <button type="button" class="btn ghost" id="stat-cancel">@await Html.PartialAsync("_Icon", "x") Cancelar</button>
+        </div>
+    </div>
+</div>
+<script>
+    window.COPY_STATS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Stats ?? [], json));
+</script>
+@section Scripts {
+    <script src="~/js/copy-edit.js" asp-append-version="true"></script>
+}

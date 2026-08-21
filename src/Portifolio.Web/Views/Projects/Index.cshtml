@@ -1,0 +1,28 @@
+@model List<Portifolio.Web.Models.ProjectRecord>
+@{
+    Layout = "_EditLayout";
+    ViewData["Title"] = "Projetos";
+}
+<h1>Projetos</h1>
+<div class="actions"><a class="btn" href="~/edit/projetos/novo">@await Html.PartialAsync("_Icon", "plus") Novo projeto</a></div>
+<table>
+    <thead><tr><th>Ano</th><th>Título</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@p.Year</td>
+            <td>@p.Title</td>
+            <td>
+                <div class="table-actions">
+                    <a class="btn btn-icon ghost" href="~/edit/projetos/@p.Id" title="Editar" aria-label="Editar">@await Html.PartialAsync("_Icon", "edit")</a>
+                    <form method="post" action="~/edit/projetos/@p.Id/excluir" onsubmit="return confirm('Remover o projeto @p.Title?');">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-icon ghost danger" type="submit" title="Excluir" aria-label="Excluir">@await Html.PartialAsync("_Icon", "trash")</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

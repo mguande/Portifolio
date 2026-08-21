@@ -1,0 +1,52 @@
+@model List<Portifolio.Web.Models.Profile>
+@{
+    Layout = "_EditLayout";
+    ViewData["Title"] = "Perfis";
+}
+<h1>Perfis</h1>
+<p class="hint">Edite os dados ou importe o PDF gerado pelo LinkedIn (Mais · Salvar em PDF).</p>
+<div class="actions"><button type="button" class="btn" id="open-new-profile">@await Html.PartialAsync("_Icon", "plus") Novo perfil</button></div>
+<table>
+    <thead><tr><th>Nome</th><th>Função</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@p.Name</td>
+            <td>@p.Role</td>
+            <td>
+                <div class="table-actions">
+                    <a class="btn btn-icon ghost" href="~/edit/perfis/@p.Id" title="Editar" aria-label="Editar">@await Html.PartialAsync("_Icon", "edit")</a>
+                    <a class="btn btn-icon ghost" href="~/edit/perfis/@p.Id/importar" title="Importar LinkedIn" aria-label="Importar LinkedIn">@await Html.PartialAsync("_Icon", "pdf")</a>
+                    <form method="post" action="~/edit/perfis/@p.Id/excluir" onsubmit="return confirm('Remover o perfil @p.Name?');">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-icon ghost danger" type="submit" title="Excluir" aria-label="Excluir">@await Html.PartialAsync("_Icon", "trash")</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div class="modal-backdrop" id="new-profile-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="new-profile-title">
+        <h2 id="new-profile-title">Novo perfil</h2>
+        <p class="hint">Como deseja cadastrar?</p>
+        <div class="actions">
+            <a class="btn" href="~/edit/perfis/novo">@await Html.PartialAsync("_Icon", "form") Cadastro manual</a>
+            <a class="btn ghost" href="~/edit/perfis/importar">@await Html.PartialAsync("_Icon", "pdf") Importar PDF do LinkedIn</a>
+        </div>
+        <div class="actions">
+            <button type="button" class="btn ghost" id="close-new-profile">@await Html.PartialAsync("_Icon", "x") Cancelar</button>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        const modal = document.getElementById("new-profile-modal");
+        document.getElementById("open-new-profile").addEventListener("click", () => { modal.hidden = false; });
+        document.getElementById("close-new-profile").addEventListener("click", () => { modal.hidden = true; });
+        modal.addEventListener("click", (event) => { if (event.target === modal) modal.hidden = true; });
+    </script>
+}

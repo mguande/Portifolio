@@ -1,0 +1,82 @@
+@model List<Portifolio.Web.Models.StackItem>
+@{
+    Layout = "_EditLayout";
+    ViewData["Title"] = "Stacks";
+}
+<h1>Stacks</h1>
+<p class="hint">Estas tecnologias aparecem em Ferramentas &amp; tecnologias no site e nas opções dos projetos.</p>
+<div class="actions"><button type="button" class="btn" id="open-stack">@await Html.PartialAsync("_Icon", "plus") Nova stack</button></div>
+<table>
+    <thead><tr><th>Nome</th><th></th></tr></thead>
+    <tbody>
+    @for (var i = 0; i < Model.Count; i++)
+    {
+        var item = Model[i];
+        <tr>
+            <td>@item.Name</td>
+            <td>
+                <div class="table-actions">
+                    @if (i > 0)
+                    {
+                        <form method="post" action="~/edit/stacks/@item.Id/mover">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="delta" value="-1" />
+                            <button class="btn btn-icon ghost" type="submit" title="Subir" aria-label="Subir">@await Html.PartialAsync("_Icon", "up")</button>
+                        </form>
+                    }
+                    @if (i < Model.Count - 1)
+                    {
+                        <form method="post" action="~/edit/stacks/@item.Id/mover">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="delta" value="1" />
+                            <button class="btn btn-icon ghost" type="submit" title="Descer" aria-label="Descer">@await Html.PartialAsync("_Icon", "down")</button>
+                        </form>
+                    }
+                    <button type="button" class="btn btn-icon ghost" data-edit="@item.Id" data-name="@item.Name" title="Editar" aria-label="Editar">@await Html.PartialAsync("_Icon", "edit")</button>
+                    <form method="post" action="~/edit/stacks/@item.Id/excluir" onsubmit="return confirm('Remover a stack @item.Name? Ela sai dos projetos vinculados.');">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-icon ghost danger" type="submit" title="Excluir" aria-label="Excluir">@await Html.PartialAsync("_Icon", "trash")</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div class="modal-backdrop" id="stack-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="stack-title">
+        <h2 id="stack-title">Nova stack</h2>
+        <form method="post" action="~/edit/stacks/salvar">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" id="stack-id" value="0" />
+            <label>Nome</label>
+            <input name="name" id="stack-name" required />
+            <div class="actions">
+                <button type="submit">@await Html.PartialAsync("_Icon", "save") Salvar</button>
+                <button type="button" class="btn ghost" id="close-stack">@await Html.PartialAsync("_Icon", "x") Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        const modal = document.getElementById("stack-modal");
+        const title = document.getElementById("stack-title");
+        const idInput = document.getElementById("stack-id");
+        const nameInput = document.getElementById("stack-name");
+        const open = (id, name) => {
+            idInput.value = id;
+            nameInput.value = name;
+            title.textContent = id === "0" ? "Nova stack" : "Editar stack";
+            modal.hidden = false;
+            nameInput.focus();
+        };
+        document.getElementById("open-stack").addEventListener("click", () => open("0", ""));
+        document.getElementById("close-stack").addEventListener("click", () => { modal.hidden = true; });
+        modal.addEventListener("click", (event) => { if (event.target === modal) modal.hidden = true; });
+        document.querySelectorAll("[data-edit]").forEach((button) => {
+            button.addEventListener("click", () => open(button.dataset.edit, button.dataset.name || ""));
+        });
+    </script>
+}

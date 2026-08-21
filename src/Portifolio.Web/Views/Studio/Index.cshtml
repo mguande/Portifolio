@@ -1,0 +1,28 @@
+@model Portifolio.Web.Models.StudioDto
+@{
+    Layout = "_EditLayout";
+    ViewData["Title"] = "Estúdio";
+}
+<h1>Estúdio</h1>
+<form method="post">
+    @Html.AntiForgeryToken()
+    <label>Nome</label>
+    <input name="Name" value="@Model.Name" />
+    <label>Frase de capa</label>
+    <input name="Tagline" value="@Model.Tagline" />
+    <div class="row">
+        <div>
+            <label>Local</label>
+            <input name="Location" value="@Model.Location" />
+        </div>
+        <div>
+            <label>E-mail</label>
+            <input name="Email" value="@Model.Email" />
+        </div>
+    </div>
+    <label>Telefone</label>
+    <input name="Phone" value="@Model.Phone" />
+    <label>Texto do hero</label>
+    <textarea class="html-editor" name="Intro">@Model.Intro</textarea>
+    <div class="actions"><button type="submit">@await Html.PartialAsync("_Icon", "save") Salvar</button></div>
+</form>

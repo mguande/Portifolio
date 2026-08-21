@@ -1,0 +1,164 @@
+@model Portifolio.Web.Models.Person
+@{
+    Layout = "_EditLayout";
+    var profile = ViewBag.Profile as Portifolio.Web.Models.Profile;
+    var isNew = profile is null;
+    ViewData["Title"] = isNew ? "Importar LinkedIn" : "Atualizar pelo LinkedIn";
+    var hasData = !string.IsNullOrWhiteSpace(Model.Name) || Model.Experience.Count > 0 || Model.Skills.Count > 0;
+    var uploadAction = isNew ? Url.Content("~/edit/perfis/importar") : Url.Content($"~/edit/perfis/{profile!.Id}/importar");
+    var applyAction = isNew ? Url.Content("~/edit/perfis/importar/criar") : Url.Content($"~/edit/perfis/{profile!.Id}/importar/aplicar");
+}
+<h1>@(isNew ? "Importar currículo" : $"Importar currículo — {profile!.Name}")</h1>
+<p class="hint">Use o PDF gerado pelo LinkedIn (português ou inglês). A foto do perfil não vem no PDF@(isNew ? "." : " e a foto atual será mantida.")</p>
+
+@if (!hasData)
+{
+    <form id="pdf-form" method="post" action="@uploadAction" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <label>Arquivo PDF</label>
+        <input type="file" name="pdf" accept="application/pdf" required />
+        <div class="actions"><button type="submit">@await Html.PartialAsync("_Icon", "pdf") Ler PDF</button></div>
+    </form>
+}
+
+<div asp-validation-summary="All"></div>
+
+@if (hasData)
+{
+    <h2>Prévia importada</h2>
+    <div class="preview-card">
+        <p><strong>@Model.Name</strong></p>
+        <p class="hint">@Model.Role</p>
+        <p class="hint">@Model.Location @(string.IsNullOrWhiteSpace(Model.Email) ? "" : "· " + Model.Email)</p>
+        @if (!string.IsNullOrWhiteSpace(Model.Summary))
+        {
+            <p>@Model.Summary</p>
+        }
+        @if (Model.Skills.Count > 0)
+        {
+            <h3>Competências</h3>
+            <ul class="preview-list">
+                @foreach (var skill in Model.Skills)
+                {
+                    <li>@skill</li>
+                }
+            </ul>
+        }
+        @if (Model.Experience.Count > 0)
+        {
+            <h3>Experiências</h3>
+            <ul class="preview-list">
+                @foreach (var item in Model.Experience)
+                {
+                    <li><strong>@item.Title</strong> — @item.Org <span>@item.Period</span></li>
+                }
+            </ul>
+        }
+        @if (Model.Education.Count > 0)
+        {
+            <h3>Formação</h3>
+            <ul class="preview-list">
+                @foreach (var item in Model.Education)
+                {
+                    <li><strong>@item.Title</strong> — @item.Org <span>@item.Period</span></li>
+                }
+            </ul>
+        }
+    </div>
+
+    <form id="apply-form" method="post" action="@applyAction">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Name" value="@Model.Name" />
+        <input type="hidden" name="ShortName" value="@Model.ShortName" />
+        <input type="hidden" name="Role" value="@Model.Role" />
+        <input type="hidden" name="Location" value="@Model.Location" />
+        <input type="hidden" name="Email" value="@Model.Email" />
+        <input type="hidden" name="Linkedin" value="@Model.Linkedin" />
+        <input type="hidden" name="Github" value="@Model.Github" />
+        <input type="hidden" name="Summary" value="@Model.Summary" />
+        <input type="hidden" name="Bio" value="@Model.Bio" />
+        <textarea name="skillsText" hidden>@string.Join("\n", Model.Skills)</textarea>
+        @for (var i = 0; i < Model.Experience.Count; i++)
+        {
+            <input type="hidden" name="Experience[@i].Period" value="@Model.Experience[i].Period" />
+            <input type="hidden" name="Experience[@i].Title" value="@Model.Experience[i].Title" />
+            <input type="hidden" name="Experience[@i].Org" value="@Model.Experience[i].Org" />
+            <input type="hidden" name="Experience[@i].Detail" value="@Model.Experience[i].Detail" />
+        }
+        @for (var i = 0; i < Model.Education.Count; i++)
+        {
+            <input type="hidden" name="Education[@i].Period" value="@Model.Education[i].Period" />
+            <input type="hidden" name="Education[@i].Title" value="@Model.Education[i].Title" />
+            <input type="hidden" name="Education[@i].Org" value="@Model.Education[i].Org" />
+        }
+        @for (var i = 0; i < Model.Socials.Count; i++)
+        {
+            <input type="hidden" name="Socials[@i].Network" value="@Model.Socials[i].Network" />
+            <input type="hidden" name="Socials[@i].Url" value="@Model.Socials[i].Url" />
+        }
+        <div class="actions">
+            @if (isNew)
+            {
+                <button type="submit">@await Html.PartialAsync("_Icon", "plus") Aceitar e criar perfil</button>
+            }
+            else
+            {
+                <button type="submit">@await Html.PartialAsync("_Icon", "check") Aceitar e atualizar perfil</button>
+            }
+            <a class="btn ghost" href="~/edit/perfis">@await Html.PartialAsync("_Icon", "x") Cancelar</a>
+        </div>
+    </form>
+}
+
+@if (!isNew)
+{
+    <div class="modal-backdrop" id="confirm-update-modal" hidden>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-update-title">
+            <h2 id="confirm-update-title">Atualizar perfil?</h2>
+            <p>Este perfil já existe. Deseja atualizar todos os dados com o conteúdo importado do PDF? A foto atual será mantida.</p>
+            <div class="actions">
+                <button type="button" id="confirm-update-yes">@await Html.PartialAsync("_Icon", "check") Sim, atualizar</button>
+                <button type="button" class="btn ghost" id="confirm-update-no">@await Html.PartialAsync("_Icon", "x") Não</button>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @if (!isNew)
+    {
+        <script>
+            const confirmModal = document.getElementById("confirm-update-modal");
+            const pdfForm = document.getElementById("pdf-form");
+            const applyForm = document.getElementById("apply-form");
+            let pendingForm = null;
+
+            const openConfirm = (form) => {
+                pendingForm = form;
+                confirmModal.hidden = false;
+            };
+            const closeConfirm = () => {
+                pendingForm = null;
+                confirmModal.hidden = true;
+            };
+
+            pdfForm?.addEventListener("submit", (event) => {
+                event.preventDefault();
+                openConfirm(pdfForm);
+            });
+            applyForm?.addEventListener("submit", (event) => {
+                event.preventDefault();
+                openConfirm(applyForm);
+            });
+            document.getElementById("confirm-update-yes").addEventListener("click", () => {
+                const form = pendingForm;
+                closeConfirm();
+                form?.submit();
+            });
+            document.getElementById("confirm-update-no").addEventListener("click", closeConfirm);
+            confirmModal.addEventListener("click", (event) => {
+                if (event.target === confirmModal) closeConfirm();
+            });
+        </script>
+    }
+}

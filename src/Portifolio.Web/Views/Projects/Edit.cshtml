@@ -1,0 +1,92 @@
+@model Portifolio.Web.Models.ProjectRecord
+@{
+    Layout = "_EditLayout";
+    ViewData["Title"] = "Projeto";
+    var people = (ViewBag.People as List<Portifolio.Web.Models.Profile>) ?? [];
+    var knownStacks = (ViewBag.KnownStacks as List<string>) ?? [];
+    var json = new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase };
+}
+<h1>@(string.IsNullOrWhiteSpace(Model.Title) ? "Novo projeto" : Model.Title)</h1>
+<form method="post" action="~/edit/projetos/salvar">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <input type="hidden" name="PublicId" value="@Model.PublicId" />
+    <input type="hidden" name="Authorship" id="authorship" value="@Model.Authorship" />
+    <label>Ano</label>
+    <input name="Year" value="@Model.Year" />
+    <label>Título</label>
+    <input name="Title" value="@Model.Title" />
+    <label>Setor</label>
+    <input name="Sector" value="@Model.Sector" />
+
+    <section class="list-block">
+        <div class="list-head">
+            <h2>Autores</h2>
+            <button type="button" class="btn ghost" id="add-author">@await Html.PartialAsync("_Icon", "plus") Adicionar autor</button>
+        </div>
+        <p class="hint">Se todos os perfis estiverem na lista, o projeto aparece no filtro <strong>Conjuntos</strong> do site.</p>
+        <ul class="item-list" id="authors-list"></ul>
+        <div id="hidden-authors"></div>
+    </section>
+
+    <label>Resumo</label>
+    <textarea class="html-editor" name="Summary">@Model.Summary</textarea>
+    <label>Resultado</label>
+    <textarea class="html-editor" name="Outcome">@Model.Outcome</textarea>
+
+    <section class="list-block">
+        <div class="list-head">
+            <h2>Stack</h2>
+            <button type="button" class="btn ghost" id="add-stack">@await Html.PartialAsync("_Icon", "plus") Adicionar stack</button>
+        </div>
+        <p class="hint">As opções vêm do cadastro de stacks. Um nome novo é criado e vinculado a este projeto.</p>
+        <ul class="item-list" id="stack-list"></ul>
+        <div id="hidden-stack"></div>
+    </section>
+    <div class="actions">
+        <button type="submit">@await Html.PartialAsync("_Icon", "save") Salvar</button>
+        <a class="btn ghost" href="~/edit/projetos">@await Html.PartialAsync("_Icon", "back") Voltar</a>
+    </div>
+</form>
+@if (Model.Id > 0)
+{
+    <form method="post" action="~/edit/projetos/@Model.Id/excluir" onsubmit="return confirm('Remover este projeto?');">
+        @Html.AntiForgeryToken()
+        <button class="btn ghost" type="submit">@await Html.PartialAsync("_Icon", "trash") Excluir</button>
+    </form>
+}
+
+<div class="modal-backdrop" id="author-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="author-modal-title">
+        <h2 id="author-modal-title">Adicionar autor</h2>
+        <label>Perfil</label>
+        <select id="author-select"></select>
+        <p class="hint" id="author-empty" hidden>Todos os perfis já foram adicionados.</p>
+        <div class="actions">
+            <button type="button" id="author-save">@await Html.PartialAsync("_Icon", "save") Salvar</button>
+            <button type="button" class="btn ghost" id="author-cancel">@await Html.PartialAsync("_Icon", "x") Cancelar</button>
+        </div>
+    </div>
+</div>
+<div class="modal-backdrop" id="stack-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="stack-modal-title">
+        <h2 id="stack-modal-title">Adicionar stack</h2>
+        <label>Tecnologia</label>
+        <input id="stack-input" type="text" autocomplete="off" placeholder="Digite para filtrar ou cadastrar" />
+        <ul class="suggest-list" id="stack-suggest"></ul>
+        <p class="hint" id="stack-new-hint" hidden>Nenhuma opção com esse texto. Ao salvar, a stack entra no cadastro e neste projeto.</p>
+        <div class="actions">
+            <button type="button" id="stack-save">@await Html.PartialAsync("_Icon", "save") Salvar</button>
+            <button type="button" class="btn ghost" id="stack-cancel">@await Html.PartialAsync("_Icon", "x") Cancelar</button>
+        </div>
+    </div>
+</div>
+<script>
+    window.PROJECT_AUTHORS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Authors ?? [], json));
+    window.PROJECT_PEOPLE = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(people.Select(p => new { id = p.PublicId, name = p.Name, shortName = p.ShortName }), json));
+    window.PROJECT_STACK = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Stack ?? [], json));
+    window.KNOWN_STACKS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(knownStacks, json));
+</script>
+@section Scripts {
+    <script src="~/js/project-edit.js" asp-append-version="true"></script>
+}

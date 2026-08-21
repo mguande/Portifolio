@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] — Edição</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fraunces:wght@500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/edit.css" asp-append-version="true" />
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@7.7.2/tinymce.min.js" referrerpolicy="origin"></script>
+</head>
+<body>
+    <partial name="_IconSprite" />
+    <aside>
+        <a class="brand" href="~/edit">Portfólio</a>
+        <nav>
+            <a href="~/edit">@await Html.PartialAsync("_Icon", "home") Painel</a>
+            <a href="~/edit/estudio">@await Html.PartialAsync("_Icon", "studio") Estúdio</a>
+            <a href="~/edit/textos">@await Html.PartialAsync("_Icon", "text") Textos</a>
+            <a href="~/edit/perfis">@await Html.PartialAsync("_Icon", "users") Perfis</a>
+            <a href="~/edit/projetos">@await Html.PartialAsync("_Icon", "briefcase") Projetos</a>
+            <a href="~/edit/stacks">@await Html.PartialAsync("_Icon", "layers") Stacks</a>
+            <a href="~/edit/usuarios">@await Html.PartialAsync("_Icon", "user") Usuários</a>
+            <a href="~/" target="_blank">@await Html.PartialAsync("_Icon", "eye") Ver site</a>
+        </nav>
+        <form method="post" action="~/edit/logout">
+            @Html.AntiForgeryToken()
+            <button type="submit">@await Html.PartialAsync("_Icon", "logout") Sair</button>
+        </form>
+    </aside>
+    <main>
+        @if (TempData["Ok"] is string ok)
+        {
+            <p class="flash ok">@ok</p>
+        }
+        @if (TempData["Error"] is string err)
+        {
+            <p class="flash err">@err</p>
+        }
+        @RenderBody()
+    </main>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/js/rich-edit.js" asp-append-version="true"></script>
+</body>
+</html>

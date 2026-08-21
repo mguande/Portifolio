@@ -1,0 +1,81 @@
+@using System.Text.Json
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Portfólio profissional de sistemas de TI." />
+    <title>Portfólio — Sistemas de TI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+  </head>
+  <body>
+    <section class="hero" id="topo">
+      <div class="wrap">
+        <div class="hero-top">
+          <a class="mark" href="#topo" id="studio-mark">G<span class="dot">·</span>M</a>
+          <nav class="hero-nav" id="hero-nav" aria-label="Áreas">Produto <span class="dot">/</span> Arquitetura <span class="dot">/</span> Tecnologia</nav>
+        </div>
+        <div class="hero-grid">
+          <div class="reveal">
+            <span class="eyebrow" id="hero-eyebrow">Portfólio profissional</span>
+            <h1 id="hero-title"></h1>
+            <div class="tagline rich" id="hero-lead"></div>
+            <div class="stat-row" id="hero-stats"></div>
+          </div>
+          <div class="duo-photo reveal" id="duo-photo"></div>
+        </div>
+      </div>
+    </section>
+    <section class="mission" id="abordagem">
+      <div class="wrap reveal">
+        <div class="rich" id="mission-text"></div>
+      </div>
+    </section>
+    <section class="profiles" id="quem-somos">
+      <div class="wrap">
+        <h2 class="reveal" id="perfis-title">Quem somos</h2>
+        <div class="reveal rich" id="perfis-lead"></div>
+        <div class="prof-grid" id="people"></div>
+      </div>
+    </section>
+    <section class="projects" id="trabalho">
+      <div class="wrap">
+        <h2 class="reveal" id="trabalho-title">Projetos</h2>
+        <div class="lead reveal rich" id="projetos-lead"></div>
+        <div class="filters" id="filters" role="group" aria-label="Filtrar projetos"></div>
+        <div class="proj-grid" id="projects"></div>
+      </div>
+    </section>
+    <section class="stack" id="stack">
+      <div class="wrap">
+        <h2 class="reveal" id="stack-title">Ferramentas</h2>
+        <div class="stack-row reveal" id="stack-row"></div>
+      </div>
+    </section>
+    <section class="cta" id="contato">
+      <div class="wrap reveal">
+        <span class="eyebrow" id="cta-eyebrow">Vamos conversar</span>
+        <div class="cta-title rich" id="contato-title"></div>
+        <div class="rich" id="cta-lead"></div>
+        <div class="cta-btns" id="cta-btns"></div>
+      </div>
+    </section>
+    <footer>
+      <div class="wrap">
+        <div class="foot-grid" id="footer-grid"></div>
+        <div class="foot-bottom">
+          <span>© <span id="year"></span> <span id="footer-name"></span></span>
+          <span id="footer-location"></span>
+        </div>
+      </div>
+    </footer>
+    <script>window.PORTFOLIO = @Html.Raw(ViewBag.PortfolioJson ?? "{}"); window.PATH_BASE = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Context.Request.PathBase.Value ?? ""));</script>
+    <script src="~/js/app.js" asp-append-version="true"></script>
+  </body>
+</html>

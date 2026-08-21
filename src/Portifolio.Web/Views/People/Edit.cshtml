@@ -1,0 +1,120 @@
+@model Portifolio.Web.Models.Profile
+@{
+    Layout = "_EditLayout";
+    ViewData["Title"] = "Perfil";
+    var photoUrl = string.IsNullOrWhiteSpace(Model.Photo)
+        ? "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+        : Url.Content($"~/{Model.Photo.TrimStart('/')}?v={DateTime.UtcNow.Ticks}");
+    var json = new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase };
+}
+<h1>@(string.IsNullOrWhiteSpace(Model.Name) ? "Novo perfil" : Model.Name)</h1>
+<form id="profile-form" method="post" action="~/edit/perfis/salvar" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <input type="hidden" name="PublicId" value="@Model.PublicId" />
+    <label>Nome curto</label>
+    <input name="ShortName" value="@Model.ShortName" />
+    <label>Nome completo</label>
+    <input name="Name" value="@Model.Name" />
+    <label>Função</label>
+    <input name="Role" value="@Model.Role" />
+    <div class="row">
+        <div>
+            <label>Cidade</label>
+            <input name="Location" value="@Model.Location" />
+        </div>
+        <div>
+            <label>E-mail</label>
+            <input name="Email" value="@Model.Email" />
+        </div>
+    </div>
+
+    <label>Foto do perfil</label>
+    <div class="photo-box">
+        <img id="photo-preview" src="@photoUrl" alt="Foto atual" class="@(string.IsNullOrWhiteSpace(Model.Photo) ? "is-empty" : "")" />
+        <div>
+            <p class="hint" id="photo-hint">@(string.IsNullOrWhiteSpace(Model.Photo) ? "Nenhuma foto cadastrada." : Model.Photo)</p>
+            <input type="hidden" name="Photo" value="@Model.Photo" />
+            <input id="photo-input" type="file" name="photo" accept="image/*" />
+        </div>
+    </div>
+
+    <label>Texto do card</label>
+    <textarea class="html-editor" name="Bio">@Model.Bio</textarea>
+    <label>Resumo</label>
+    <textarea class="html-editor" name="Summary">@Model.Summary</textarea>
+
+    <section class="list-block" data-list="skills">
+        <div class="list-head">
+            <h2>Competências</h2>
+            <button type="button" class="btn ghost" data-add="skills">@await Html.PartialAsync("_Icon", "plus") Nova competência</button>
+        </div>
+        <ul class="item-list" id="skills-list"></ul>
+    </section>
+
+    <section class="list-block" data-list="socials">
+        <div class="list-head">
+            <h2>Redes sociais</h2>
+            <button type="button" class="btn ghost" data-add="socials">@await Html.PartialAsync("_Icon", "plus") Nova rede</button>
+        </div>
+        <ul class="item-list" id="socials-list"></ul>
+    </section>
+
+    <section class="list-block" data-list="experience">
+        <div class="list-head">
+            <h2>Experiências</h2>
+            <button type="button" class="btn ghost" data-add="experience">@await Html.PartialAsync("_Icon", "plus") Nova experiência</button>
+        </div>
+        <ul class="item-list" id="experience-list"></ul>
+    </section>
+
+    <section class="list-block" data-list="education">
+        <div class="list-head">
+            <h2>Formação</h2>
+            <button type="button" class="btn ghost" data-add="education">@await Html.PartialAsync("_Icon", "plus") Nova formação</button>
+        </div>
+        <ul class="item-list" id="education-list"></ul>
+    </section>
+
+    <div id="hidden-lists"></div>
+
+    <div class="actions">
+        <button type="submit">@await Html.PartialAsync("_Icon", "save") Salvar</button>
+        <a class="btn ghost" href="~/edit/perfis">@await Html.PartialAsync("_Icon", "back") Voltar</a>
+        @if (Model.Id > 0)
+        {
+            <a class="btn ghost" href="~/edit/perfis/@Model.Id/importar">@await Html.PartialAsync("_Icon", "pdf") Importar LinkedIn</a>
+        }
+    </div>
+</form>
+@if (Model.Id > 0)
+{
+    <form method="post" action="~/edit/perfis/@Model.Id/excluir" onsubmit="return confirm('Remover este perfil?');">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn ghost">@await Html.PartialAsync("_Icon", "trash") Excluir</button>
+    </form>
+}
+
+<div class="modal-backdrop" id="item-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h2 id="modal-title">Item</h2>
+        <div id="modal-fields"></div>
+        <div class="actions">
+            <button type="button" id="modal-save">@await Html.PartialAsync("_Icon", "save") Salvar item</button>
+            <button type="button" class="btn ghost" id="modal-cancel">@await Html.PartialAsync("_Icon", "x") Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.PROFILE_LISTS = {
+        skills: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Skills ?? [], json)),
+        socials: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Socials ?? [], json)),
+        experience: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Experience ?? [], json)),
+        education: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Education ?? [], json)),
+        networks: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(SocialNetworks.All.Select(n => new { id = n.Id, label = n.Label }), json))
+    };
+</script>
+@section Scripts {
+    <script src="~/js/profile-edit.js" asp-append-version="true"></script>
+}
