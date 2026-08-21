@@ -93,3 +93,4 @@ yarn-error.log*
 
 _docs/
 _html
+src/editor/
