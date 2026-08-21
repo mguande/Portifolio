@@ -7,6 +7,32 @@ Site público de portfólio (ASP.NET Core 9) com área autenticada para editar e
 
 Repositório: [github.com/mguande/Portifolio](https://github.com/mguande/Portifolio)
 
+## Destaques
+
+### Importação de CV do LinkedIn
+
+O caminho mais rápido para montar um perfil no site:
+
+1. No LinkedIn, gere o PDF em **Mais → Salvar em PDF**.
+2. Em `/edit/perfis`, importe o arquivo (perfil novo ou um já existente).
+3. O parser extrai nome, cargo, resumo, competências, experiências, formação e redes.
+4. Aparece uma **prévia** para conferir os dados.
+5. Confirme para criar ou atualizar o perfil. Se o perfil já existir, o sistema pergunta antes de sobrescrever e pode **manter a foto** atual.
+6. Depois da importação, **edite tudo no formulário**: textos ricos, foto, competências, experiências, formação e redes sociais.
+
+O PDF é o atalho; o cadastro manual continua disponível para quem não usa LinkedIn.
+
+### O que mais o projeto faz
+
+- **CMS próprio** — estúdio, textos do site, perfis, projetos e stacks, sem editar HTML estático.
+- **Dois (ou mais) perfis** no mesmo site, com filtro de projetos por pessoa e por trabalhos **conjuntos**.
+- **Projetos** com autores, stack, resumo, resultado e ícones de **repositório** ou **link** (site, demo), no mesmo estilo das redes do perfil.
+- **Cadastro de stacks** reutilizado na seção Ferramentas & tecnologias e nas opções de cada projeto; um nome novo digitado no projeto entra no cadastro e no vínculo.
+- **Editor rico** (TinyMCE) em textos longos; o site público renderiza o HTML.
+- **Identidade** (login, usuários, cookie) só na área `/edit`.
+- **Banco flexível**: SQLite no dia a dia; PostgreSQL ou MySQL em produção.
+- **Hospedagem em subpasta** (`PathBase`), por exemplo `https://servidor/Portifolio` no IIS.
+
 ## Ferramentas necessárias
 
 | Ferramenta | Uso |
@@ -20,8 +46,6 @@ Opcional:
 - [Git](https://git-scm.com/)
 - PostgreSQL 15+ ou MySQL 8+, se não quiser SQLite
 - No Windows, [ASP.NET Core 9 Hosting Bundle](https://dotnet.microsoft.com/permalink/dotnetcore-current) para publicar no IIS
-
-O projeto `src/editor` (WinForms) é um utilitário antigo de importação LinkedIn. **Não é necessário** para o site.
 
 ## Como executar em desenvolvimento
 
@@ -93,8 +117,8 @@ Deixe `""` quando a aplicação estiver em `https://seusite.com/`. O cookie de l
 1. Acesse `/edit/login` (ou `/Portifolio/edit/login` com PathBase).
 2. Entre com o usuário seed (ou outro criado em **Usuários**).
 3. Edite **Estúdio**, **Textos**, **Perfis**, **Projetos** e **Stacks**.
-4. **Perfis** aceitam cadastro manual ou importação do PDF do LinkedIn (*Mais → Salvar em PDF*).
-5. **Stacks** alimentam a seção de ferramentas do site e as opções dos projetos. Uma stack nova digitada no projeto é cadastrada e vinculada automaticamente.
+4. Em **Perfis**, escolha cadastro manual ou o fluxo de importação do LinkedIn descrito em **Destaques**.
+5. Depois de importar, abra o perfil e ajuste o que quiser antes (ou depois) de publicar no site.
 
 ## Ambientes sugeridos para deploy
 
@@ -141,7 +165,6 @@ Bom custo e operação em VPS (DigitalOcean, Hetzner, Oracle Cloud, etc.).
 ```
 Portifolio.sln
 src/Portifolio.Web/     site MVC, área /edit, Identity, EF Core
-src/editor/             ferramenta desktop opcional
 db/                     SQLite local (gerado em runtime)
 ```
 

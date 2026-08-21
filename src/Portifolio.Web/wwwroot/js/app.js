@@ -70,6 +70,22 @@
     return `<a class="social" href="${item.url}"${extra} title="${label}" aria-label="${label}">${icon}<span>${label}</span></a>`;
   };
 
+  const renderProjectLink = (item) => {
+    const url = String(item.url || "");
+    const kind = item.kind === "tool" ? "tool" : "repository";
+    const lower = url.toLowerCase();
+    let network = "website";
+    let label = "Link";
+    if (kind === "repository") {
+      label = "Repositório";
+      if (lower.includes("github.com")) network = "github";
+      else if (lower.includes("gitlab.com")) network = "gitlab";
+      else network = "github";
+    }
+    const icon = socialIcons[network] || socialIcons.website;
+    return `<a class="social" href="${url}" target="_blank" rel="noreferrer" title="${label}" aria-label="${label}">${icon}<span>${label}</span></a>`;
+  };
+
   const initials = (person) => {
     const source = person.shortName || person.name || "?";
     return source
@@ -294,7 +310,13 @@
             <span class="proj-tag">${project.sector} · ${project.year}</span>
             <h3>${project.title}</h3>
             <div class="rich">${project.summary}</div>
+            ${
+              (project.stack || []).length
+                ? `<p class="proj-stack">${(project.stack || []).join(" · ")}</p>`
+                : ""
+            }
             <div class="proj-owner">${ownerMarkup(project)}</div>
+            <div class="proj-links">${(project.links || []).map(renderProjectLink).join("")}</div>
           </article>`;
       })
       .join("");

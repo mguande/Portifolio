@@ -65,4 +65,5 @@ public sealed class ProjectDto
     public string Summary { get; set; } = "";
     public string Outcome { get; set; } = "";
     public List<string> Stack { get; set; } = [];
+    public List<ProjectLink> Links { get; set; } = [];
 }

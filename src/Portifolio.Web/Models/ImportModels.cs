@@ -40,6 +40,21 @@ public sealed class Education
     public string Org { get; set; } = "";
 }
 
+public sealed class ProjectLink
+{
+    public string Kind { get; set; } = "repository";
+    public string Url { get; set; } = "";
+}
+
+public static class ProjectLinkKinds
+{
+    public static readonly (string Id, string Label)[] All =
+    [
+        ("repository", "Repositório"),
+        ("tool", "Link"),
+    ];
+}
+
 public static class SocialNetworks
 {
     public static readonly (string Id, string Label)[] All =

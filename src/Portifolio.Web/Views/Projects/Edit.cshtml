@@ -43,6 +43,16 @@
         <ul class="item-list" id="stack-list"></ul>
         <div id="hidden-stack"></div>
     </section>
+
+    <section class="list-block">
+        <div class="list-head">
+            <h2>Links</h2>
+            <button type="button" class="btn ghost" id="add-link">@await Html.PartialAsync("_Icon", "plus") Adicionar link</button>
+        </div>
+        <p class="hint">Repositório (GitHub, GitLab, etc.) ou um link (site, demo, produto). Aparecem no card do projeto no site.</p>
+        <ul class="item-list" id="links-list"></ul>
+        <div id="hidden-links"></div>
+    </section>
     <div class="actions">
         <button type="submit">@await Html.PartialAsync("_Icon", "save") Salvar</button>
         <a class="btn ghost" href="~/edit/projetos">@await Html.PartialAsync("_Icon", "back") Voltar</a>
@@ -81,11 +91,28 @@
         </div>
     </div>
 </div>
+<div class="modal-backdrop" id="link-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="link-modal-title">
+        <h2 id="link-modal-title">Adicionar link</h2>
+        <label>Tipo</label>
+        <select id="link-kind">
+            <option value="repository">Repositório</option>
+            <option value="tool">Link</option>
+        </select>
+        <label>URL</label>
+        <input id="link-url" type="url" autocomplete="off" placeholder="https://" />
+        <div class="actions">
+            <button type="button" id="link-save">@await Html.PartialAsync("_Icon", "save") Salvar</button>
+            <button type="button" class="btn ghost" id="link-cancel">@await Html.PartialAsync("_Icon", "x") Cancelar</button>
+        </div>
+    </div>
+</div>
 <script>
     window.PROJECT_AUTHORS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Authors ?? [], json));
     window.PROJECT_PEOPLE = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(people.Select(p => new { id = p.PublicId, name = p.Name, shortName = p.ShortName }), json));
     window.PROJECT_STACK = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Stack ?? [], json));
     window.KNOWN_STACKS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(knownStacks, json));
+    window.PROJECT_LINKS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Links ?? [], json));
 </script>
 @section Scripts {
     <script src="~/js/project-edit.js" asp-append-version="true"></script>

@@ -743,6 +743,14 @@ img {
   margin-bottom: 16px;
 }
 
+.proj-card .proj-stack {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: #9a9084;
+  margin: -6px 0 16px;
+  line-height: 1.5;
+}
+
 .proj-owner {
   display: flex;
   align-items: center;
@@ -770,6 +778,41 @@ img {
 
 .proj-owner .badge.teal {
   background: var(--teal);
+}
+
+.proj-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.proj-links:empty { display: none; }
+
+.proj-links .social {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--teal);
+  background: var(--white);
+}
+
+.proj-links .social span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.proj-links .social:hover {
+  background: var(--panel);
+  border-color: var(--gold-soft);
+  color: var(--gold);
 }
 
 .stack {

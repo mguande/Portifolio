@@ -193,4 +193,83 @@
   });
 
   renderStack();
+
+  const linkItems = Array.isArray(window.PROJECT_LINKS) ? [...window.PROJECT_LINKS] : [];
+  const linkLabels = { repository: "Repositório", tool: "Link" };
+
+  const renderLinks = () => {
+    document.getElementById("links-list").innerHTML =
+      linkItems
+        .map(
+          (item, i) => `
+        <li>
+          <div>
+            <strong>${escapeHtml(linkLabels[item.kind] || item.kind)}</strong>
+            <span>${escapeHtml(item.url)}</span>
+          </div>
+          <div class="item-actions">
+            <button type="button" class="btn-icon" data-link-remove="${i}" title="Excluir" aria-label="Excluir">
+              <svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>
+            </button>
+          </div>
+        </li>`
+        )
+        .join("") || `<li class="empty">Nenhum link adicionado.</li>`;
+
+    document.getElementById("hidden-links").innerHTML = linkItems
+      .map(
+        (item, i) =>
+          `<input type="hidden" name="Links[${i}].Kind" value="${escapeHtml(item.kind || "repository").replaceAll('"', "&quot;")}" />` +
+          `<input type="hidden" name="Links[${i}].Url" value="${escapeHtml(item.url).replaceAll('"', "&quot;")}" />`
+      )
+      .join("");
+  };
+
+  const linkModal = document.getElementById("link-modal");
+  const linkKind = document.getElementById("link-kind");
+  const linkUrl = document.getElementById("link-url");
+
+  const openLinkModal = () => {
+    linkKind.value = "repository";
+    linkUrl.value = "";
+    linkModal.hidden = false;
+    linkUrl.focus();
+  };
+
+  const closeLinkModal = () => {
+    linkModal.hidden = true;
+  };
+
+  const addLink = () => {
+    let url = linkUrl.value.trim();
+    if (!url) return;
+    if (!/^https?:\/\//i.test(url) && !url.startsWith("mailto:")) url = `https://${url}`;
+    linkItems.push({ kind: linkKind.value === "tool" ? "tool" : "repository", url });
+    renderLinks();
+  };
+
+  document.getElementById("add-link").addEventListener("click", openLinkModal);
+  document.getElementById("link-cancel").addEventListener("click", closeLinkModal);
+  linkModal.addEventListener("click", (event) => {
+    if (event.target === linkModal) closeLinkModal();
+  });
+  document.getElementById("link-save").addEventListener("click", () => {
+    addLink();
+    closeLinkModal();
+  });
+  linkUrl.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addLink();
+      closeLinkModal();
+    }
+  });
+  document.getElementById("links-list").addEventListener("click", (event) => {
+    const remove = event.target.closest("[data-link-remove]");
+    if (!remove) return;
+    linkItems.splice(Number(remove.dataset.linkRemove), 1);
+    renderLinks();
+  });
+
+  renderLinks();
 })();

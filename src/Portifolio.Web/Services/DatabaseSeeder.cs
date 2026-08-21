@@ -100,6 +100,7 @@ public sealed class DatabaseSeeder(
                 Summary = project.Summary,
                 Outcome = project.Outcome,
                 Stack = project.Stack ?? [],
+                Links = project.Links ?? [],
             });
         }
 

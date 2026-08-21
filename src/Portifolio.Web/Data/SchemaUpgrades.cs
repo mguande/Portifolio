@@ -1,3 +1,4 @@
+using System.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Portifolio.Web.Data;
@@ -29,6 +30,7 @@ public static class SchemaUpgrades
             await db.Database.ExecuteSqlRawAsync("""
                 CREATE INDEX IF NOT EXISTS "IX_ProjectStacks_StackId" ON "ProjectStacks" ("StackId");
                 """);
+            await EnsureSqliteColumnAsync(db, "Projects", "Links", "TEXT NOT NULL DEFAULT '[]'");
             return;
         }
 
@@ -51,6 +53,9 @@ public static class SchemaUpgrades
                     CONSTRAINT "FK_ProjectStacks_Stacks_StackId" FOREIGN KEY ("StackId") REFERENCES "Stacks" ("Id") ON DELETE CASCADE
                 );
                 """);
+            await db.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE "Projects" ADD COLUMN IF NOT EXISTS "Links" text NOT NULL DEFAULT '[]';
+                """);
             return;
         }
 
@@ -72,5 +77,36 @@ public static class SchemaUpgrades
                 CONSTRAINT `FK_ProjectStacks_Stacks_StackId` FOREIGN KEY (`StackId`) REFERENCES `Stacks` (`Id`) ON DELETE CASCADE
             );
             """);
+    }
+
+    private static async Task EnsureSqliteColumnAsync(AppDbContext db, string table, string column, string definition)
+    {
+        var exists = false;
+        var conn = db.Database.GetDbConnection();
+        var opened = conn.State == ConnectionState.Open;
+        if (!opened)
+            await conn.OpenAsync();
+        try
+        {
+            await using var cmd = conn.CreateCommand();
+            cmd.CommandText = $"PRAGMA table_info(\"{table}\")";
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                if (string.Equals(Convert.ToString(reader["name"]), column, StringComparison.OrdinalIgnoreCase))
+                {
+                    exists = true;
+                    break;
+                }
+            }
+        }
+        finally
+        {
+            if (!opened)
+                await conn.CloseAsync();
+        }
+
+        if (!exists)
+            await db.Database.ExecuteSqlRawAsync($"ALTER TABLE \"{table}\" ADD COLUMN \"{column}\" {definition}");
     }
 }

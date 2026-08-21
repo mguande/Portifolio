@@ -203,6 +203,14 @@ public sealed class PortfolioService(AppDbContext db)
     public async Task SaveProjectAsync(ProjectRecord project)
     {
         project.Authors = (project.Authors ?? []).Where(a => !string.IsNullOrWhiteSpace(a)).ToList();
+        project.Links = (project.Links ?? [])
+            .Where(l => !string.IsNullOrWhiteSpace(l.Url))
+            .Select(l => new ProjectLink
+            {
+                Kind = l.Kind is "tool" ? "tool" : "repository",
+                Url = l.Url.Trim(),
+            })
+            .ToList();
         var stackNames = DistinctNames(project.Stack);
         project.Stack = stackNames;
         if (project.Id == 0)
@@ -227,6 +235,7 @@ public sealed class PortfolioService(AppDbContext db)
         existing.Authors = project.Authors;
         existing.Summary = project.Summary;
         existing.Outcome = project.Outcome;
+        existing.Links = project.Links;
         existing.Stack = stackNames;
         await db.SaveChangesAsync();
         await ReplaceProjectStacksAsync(existing.Id, stackNames);
@@ -409,6 +418,7 @@ public sealed class PortfolioService(AppDbContext db)
         Summary = p.Summary,
         Outcome = p.Outcome,
         Stack = NamesOf(p),
+        Links = p.Links ?? [],
     };
 
     private static SiteCopyDto MapCopy(SiteCopySettings c, List<string> stacks) => new()

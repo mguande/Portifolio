@@ -51,6 +51,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         ConvertJson<Profile, List<Education>>(builder, e => e.Education);
         ConvertJson<ProjectRecord, List<string>>(builder, e => e.Authors);
         ConvertJson<ProjectRecord, List<string>>(builder, e => e.Stack);
+        ConvertJson<ProjectRecord, List<ProjectLink>>(builder, e => e.Links);
     }
 
     private static void ConvertJson<TEntity, TValue>(ModelBuilder builder, System.Linq.Expressions.Expression<Func<TEntity, TValue>> property)
